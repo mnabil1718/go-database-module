@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"time"
@@ -10,7 +11,7 @@ import (
 
 func GetConnection() *sql.DB {
 	// connection string format: postgres://username:password@localhost:5432/database_name
-	db, err := sql.Open("pgx", "postgres://postgres:Cucibaju123@localhost:5432/test")
+	db, err := sql.Open("pgx", "postgres://postgres:Cucibaju123@localhost:5432/go_db_module")
 	if err != nil {
 		panic(err)
 	}
@@ -28,10 +29,12 @@ func main() {
 	db := GetConnection()
 	defer db.Close()
 
-	var greeting string
-	err := db.QueryRow("select 'hello world'").Scan(&greeting)
+	ctx := context.Background()
+
+	_, err := db.ExecContext(ctx, "INSERT INTO customer(id, name) VALUES('eko', 'Eko');")
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
-	fmt.Println(greeting)
+
+	fmt.Println("Insert data success")
 }
