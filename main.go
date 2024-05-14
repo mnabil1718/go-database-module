@@ -31,10 +31,27 @@ func main() {
 
 	ctx := context.Background()
 
-	_, err := db.ExecContext(ctx, "INSERT INTO customer(id, name) VALUES('eko', 'Eko');")
+	_, err := db.ExecContext(ctx, "INSERT INTO customer(id, name) VALUES('joko', 'Joko');")
 	if err != nil {
 		panic(err.Error())
 	}
 
 	fmt.Println("Insert data success")
+
+	rows, err := db.Query("SELECT * FROM customer;")
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id, name string
+		err := rows.Scan(&id, &name)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		fmt.Println("ID:", id, "Name:", name)
+	}
+
 }
