@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -22,36 +20,5 @@ func GetConnection() *sql.DB {
 	db.SetConnMaxLifetime(1 * time.Hour)
 
 	return db
-
-}
-
-func main() {
-	db := GetConnection()
-	defer db.Close()
-
-	ctx := context.Background()
-
-	_, err := db.ExecContext(ctx, "INSERT INTO customer(id, name) VALUES('joko', 'Joko');")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	fmt.Println("Insert data success")
-
-	rows, err := db.Query("SELECT * FROM customer;")
-	if err != nil {
-		panic(err.Error())
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var id, name string
-		err := rows.Scan(&id, &name)
-		if err != nil {
-			panic(err.Error())
-		}
-
-		fmt.Println("ID:", id, "Name:", name)
-	}
 
 }
