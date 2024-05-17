@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
+
+	"github.com/mnabil1718/go-database-module/database"
 )
 
 func TestQueryColumnType(t *testing.T) {
-	db := GetConnection()
+	db := database.GetConnection()
 	defer db.Close()
 
 	ctx := context.Background()
@@ -81,7 +83,7 @@ func TestQueryColumnType(t *testing.T) {
 }
 
 func TestPrepareStatement(t *testing.T) {
-	db := GetConnection()
+	db := database.GetConnection()
 	defer db.Close()
 
 	ctx := context.Background()
@@ -106,7 +108,7 @@ func TestPrepareStatement(t *testing.T) {
 }
 
 func TestTransaction(t *testing.T) {
-	db := GetConnection()
+	db := database.GetConnection()
 	defer db.Close()
 
 	ctx := context.Background()
