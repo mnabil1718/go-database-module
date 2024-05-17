@@ -104,3 +104,49 @@ func TestPrepareStatement(t *testing.T) {
 		fmt.Println("Insert data success with id:", lastIndex)
 	}
 }
+
+func TestTransaction(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	ctx := context.Background()
+
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	statement, err := db.PrepareContext(ctx, "INSERT INTO comments (email, comment) VALUES ($1, $2) RETURNING id;")
+	if err != nil {
+		panic(err)
+	}
+	defer statement.Close()
+
+	var lastIndex int
+	err = statement.QueryRowContext(ctx, "test@email.com", "This is test content").Scan(&lastIndex)
+	if err != nil {
+		panic(err)
+	}
+
+	err = tx.QueryRowContext(ctx, "UPDATE comments SET comment = 'This comment is [redacted]' WHERE id = $1 RETURNING id;", lastIndex).Scan(&lastIndex)
+	if err != nil {
+		panic(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Transaction success")
+
+}
